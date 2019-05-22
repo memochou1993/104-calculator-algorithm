@@ -23,10 +23,68 @@
             wrap
           >
             <v-flex
-              sm6
               xs12
             >
               <v-card>
+                <v-card-title>
+                  <v-layout
+                    row
+                    wrap
+                  >
+                    <v-flex
+                      sm-2
+                      xs-12
+                    >
+                      <form action="">
+                        <v-text-field
+                          label="男"
+                        ></v-text-field>
+                        <v-text-field
+                          label="女"
+                        ></v-text-field>
+                      </form>
+                    </v-flex>
+                    <v-flex
+                      sm-2
+                      xs-12
+                    >
+                      <form action="">
+                        <v-text-field
+                          label="博碩士"
+                        ></v-text-field>
+                        <v-text-field
+                          label="大學"
+                        ></v-text-field>
+                        <v-text-field
+                          label="專科"
+                        ></v-text-field>
+                        <v-text-field
+                          label="高中職"
+                        ></v-text-field>
+                        <v-text-field
+                          label="國中以下"
+                        ></v-text-field>
+                      </form>
+                    </v-flex>
+                  </v-layout>
+                </v-card-title>
+              </v-card>
+            </v-flex>
+          </v-layout>
+          <v-layout
+            row
+            wrap
+          >
+            <v-flex
+              v-if="results.length"
+              v-for="(result, i) in results"
+              :key="i"
+              sm6
+              xs12
+            >
+              <v-card
+                height="100%"
+              >
                 <v-card-title>
                   <v-layout
                     column
@@ -34,12 +92,14 @@
                     <v-flex>
                       <h3
                         class="headline mb-0"
-                      >
-                        學歷分布
-                      </h3>
+                        v-text="Object.keys(result)[0]"
+                      ></h3>
                     </v-flex>
                     <v-divider></v-divider>
-                    <v-flex>
+                    <v-flex
+                      v-for="(result, i) in result[Object.keys(result)[0]]"
+                      :key="i"
+                    >
                       <v-layout
                         row
                         wrap
@@ -48,48 +108,31 @@
                         <v-flex
                           sm2
                           xs12
-                          class="py-1"
+                          class="py-1 text-sm-right"
                         >
-                          博碩士
+                          <div
+                            v-text="Object.keys(result)[0]"
+                          ></div>
                         </v-flex>
                         <v-flex
-                          sm10
-                          xs12
+                          sm8
+                          xs10
                           class="py-1"
                         >
                           <v-progress-linear
                             height="15"
-                            value="100"
                             color="amber"
-                            :buffer-value="60"
+                            :value="result[Object.keys(result)[0]] / total * 100"
                           />
                         </v-flex>
-                      </v-layout>
-                    </v-flex>
-                    <v-flex>
-                      <v-layout
-                        row
-                        wrap
-                        align-center
-                      >
                         <v-flex
                           sm2
-                          xs12
+                          xs2
                           class="py-1"
                         >
-                          大學
-                        </v-flex>
-                        <v-flex
-                          sm10
-                          xs12
-                          class="py-1"
-                        >
-                          <v-progress-linear
-                            height="15"
-                            value="100"
-                            color="amber"
-                            :buffer-value="60"
-                          />
+                          <div
+                            v-text="result[Object.keys(result)[0]]"
+                          ></div>
                         </v-flex>
                       </v-layout>
                     </v-flex>
@@ -107,75 +150,148 @@
     new Vue({
       el: '#app',
       data: {
-        message: 'Hello Vue!',
+        keys: [
+          [
+            '性別分布',
+            [
+              '男',
+              '女',
+            ],
+          ],
+          [
+            '學歷分布',
+            [
+              '博碩士',
+              '大學',
+              '專科',
+              '高中職',
+              '國中以下',
+            ],
+          ],
+          [
+            '年齡分布',
+            [
+              '20歲以下',
+              '21-25歲',
+              '26-30歲',
+              '31-35歲',
+              '36-40歲',
+              '41-45歲',
+              '46-50歲',
+              '51-55歲',
+              '56-60歲',
+              '60歲以上',
+            ],
+          ],
+          [
+            '工作經驗分布',
+            [
+              '無工作經驗',
+              '1年以下',
+              '1-3年',
+              '3-5年',
+              '5-10年',
+              '10-15年',
+              '15-20年',
+              '20-25年',
+              '25年',
+            ]
+          ]
+        ],
+        values: [
+          [0.88, 0.11],
+          [0.22, 0.66, 0.05, 0.05, 0],
+          [0, 0.50, 0.22, 0.16, 0.11, 0, 0, 0, 0, 0],
+          [0.05, 0.22, 0.16, 0.33, 0.11, 0.11, 0, 0, 0],
+        ],
+      },
+      computed: {
+        total() {
+          if (!this.values.length) {
+            return 0;
+          }
+          return this.analyze(this.values).total;
+        },
+        results() {
+          if (!this.total) {
+            return [];
+          }
+          return this.associate(this.keys, this.convert(this.values, {
+            total: this.total,
+          })).filter((element) => {
+            return !this.empty(element);
+          });
+        }
+      },
+      methods: {
+        associate(keys, values) {
+          return keys.map((key, index) => {
+            return {
+              [key[0]]: values[index].map((value, index) => {
+                return {
+                  [key[1][index]]: value,
+                };
+              }),
+            };
+          });
+        },
+        empty(array) {
+          const element = array[Object.keys(array)[0]];
+          return element.length === 1 && !element[0][Object.keys(element[0])[0]];
+        },
+        analyze(array, {
+          index = 0,
+        } = {}) {
+          return this.unique(this.max([].concat(...array.map((element) => this.calculate(element)))))[index];
+        },
+        convert(array, {
+          total = 0,
+        } = {}) {
+          return array.map((row) => {
+            return row.map(column => Math.round(column * total));
+          });
+        },
+        max(array) {
+          return array.filter((element) => {
+            return element.divisible === Math.max(...array.map((element) => element.divisible));
+          });
+        },
+        unique(array) {
+          return array.filter((element, index) => {
+            return index === array.findIndex((object) => {
+              return JSON.stringify(object) === JSON.stringify(element);
+            });
+          });
+        },
+        range(min, max) {
+          return Array.from(
+            {
+              length: max - min + 1,
+            },
+            (_, i) => min + i,
+          );
+        },
+        calculate(array, {
+          min = 11,
+          max = 30,
+        } = {}) {
+          return this.range(min, max).map((index) => {
+            const total = array.reduce((accumulator, element) => {
+              const value = Math.round(element * index);
+              return accumulator + value;
+            }, 0);
+            const divisible = array.reduce((accumulator, element) => {
+              const value = Math.round(element * index % 1 * 10) / 10 % 1 === 0 ? 1 : 0;
+              return accumulator + value;
+            }, 0);
+            return {
+              total,
+              divisible,
+            };
+          });
+        },
       },
     });
   </script>
 </body>
 </html>
-
-<script>
-const arr = [
-  [0.88, 0.11],
-  [0.22, 0.66, 0.05, 0.05],
-  [0.50, 0.22, 0.16, 0.11],
-  [0.27, 0.27, 0.11, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
-  [0.05, 0.22, 0.16, 0.33, 0.11, 0.11],
-];
-
-const { total } = analyze(arr)[0];
-
-console.log(convert(arr, {
-  total,
-}));
-
-function analyze(arr) {
-  return unique(max([].concat(...arr.map(ele => calculate(ele)))));
-}
-
-function convert(arr, {
-  total = 0,
-} = {}) {
-  return arr.map(row => {
-    return row.map(column => Math.round(column * total));
-  });
-}
-
-function max(arr) {
-  return arr.filter(ele => {
-    return ele.divisible === Math.max(...arr.map(ele => ele.divisible));
-  });
-}
-
-function unique(arr) {
-  return arr.filter((ele, i) => {
-    return i === arr.findIndex(obj => {
-      return JSON.stringify(obj) === JSON.stringify(ele);
-    });
-  });
-}
-
-function calculate(arr, {
-  min = 11,
-  max = 30,
-} = {}) {
-  let results = [];
-  for (let i = min; i <= max; i++) {
-    let total = 0;
-    let divisible = 0;
-    arr.forEach(ele => {
-      const number = ele * i;
-      const remainder = number % 1;
-      total += Math.round(number);
-      divisible += Math.round(remainder * 10) / 10 % 1 === 0 ? 1 : 0;
-    });
-    if (total < max) {
-      results.push({
-        total,
-        divisible,
-      });
-    }
-  }
-  return results;
-}
-</script>
