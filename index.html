@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+</head>
+<body>
+  <div
+    id="app"
+  >
+    <v-app>
+      <v-content>
+        <v-container
+          grid-list-xl
+        >
+          <v-layout
+            row
+            wrap
+          >
+            <v-flex
+              sm6
+              xs12
+            >
+              <v-card>
+                <v-card-title>
+                  <v-layout
+                    column
+                  >
+                    <v-flex>
+                      <h3
+                        class="headline mb-0"
+                      >
+                        學歷分布
+                      </h3>
+                    </v-flex>
+                    <v-divider></v-divider>
+                    <v-flex>
+                      <v-layout
+                        row
+                        wrap
+                        align-center
+                      >
+                        <v-flex
+                          sm2
+                          xs12
+                          class="py-1"
+                        >
+                          博碩士
+                        </v-flex>
+                        <v-flex
+                          sm10
+                          xs12
+                          class="py-1"
+                        >
+                          <v-progress-linear
+                            height="15"
+                            value="100"
+                            color="amber"
+                            :buffer-value="60"
+                          />
+                        </v-flex>
+                      </v-layout>
+                    </v-flex>
+                    <v-flex>
+                      <v-layout
+                        row
+                        wrap
+                        align-center
+                      >
+                        <v-flex
+                          sm2
+                          xs12
+                          class="py-1"
+                        >
+                          大學
+                        </v-flex>
+                        <v-flex
+                          sm10
+                          xs12
+                          class="py-1"
+                        >
+                          <v-progress-linear
+                            height="15"
+                            value="100"
+                            color="amber"
+                            :buffer-value="60"
+                          />
+                        </v-flex>
+                      </v-layout>
+                    </v-flex>
+                  </v-layout>
+                </v-card-title>
+              </v-card>
+            </v-flex>
+          </v-layout>
+        </v-container>
+      </v-content>
+    </v-app>
+  </div>
+  
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue!',
+      },
+    });
+  </script>
+</body>
+</html>
+
+<script>
+const arr = [
+  [0.88, 0.11],
+  [0.22, 0.66, 0.05, 0.05],
+  [0.50, 0.22, 0.16, 0.11],
+  [0.27, 0.27, 0.11, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
+  [0.05, 0.22, 0.16, 0.33, 0.11, 0.11],
+];
+
+const { total } = analyze(arr)[0];
+
+console.log(convert(arr, {
+  total,
+}));
+
+function analyze(arr) {
+  return unique(max([].concat(...arr.map(ele => calculate(ele)))));
+}
+
+function convert(arr, {
+  total = 0,
+} = {}) {
+  return arr.map(row => {
+    return row.map(column => Math.round(column * total));
+  });
+}
+
+function max(arr) {
+  return arr.filter(ele => {
+    return ele.divisible === Math.max(...arr.map(ele => ele.divisible));
+  });
+}
+
+function unique(arr) {
+  return arr.filter((ele, i) => {
+    return i === arr.findIndex(obj => {
+      return JSON.stringify(obj) === JSON.stringify(ele);
+    });
+  });
+}
+
+function calculate(arr, {
+  min = 11,
+  max = 30,
+} = {}) {
+  let results = [];
+  for (let i = min; i <= max; i++) {
+    let total = 0;
+    let divisible = 0;
+    arr.forEach(ele => {
+      const number = ele * i;
+      const remainder = number % 1;
+      total += Math.round(number);
+      divisible += Math.round(remainder * 10) / 10 % 1 === 0 ? 1 : 0;
+    });
+    if (total < max) {
+      results.push({
+        total,
+        divisible,
+      });
+    }
+  }
+  return results;
+}
+</script>
