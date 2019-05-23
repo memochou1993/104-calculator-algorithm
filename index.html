@@ -49,7 +49,7 @@
                           <v-text-field
                             v-model="field.model"
                             :label="field.label"
-                            mask="##"
+                            mask="###"
                             suffix="%"
                           ></v-text-field>
                         </div>
@@ -61,7 +61,7 @@
                             應徵人數
                           </v-subheader>
                           <v-select
-                          v-model="candidate"
+                          v-model="candidate.value"
                           :items="candidates"
                           item-text="label"
                           item-value="value"
@@ -341,12 +341,12 @@
             return !this.empty(element);
           });
         },
-        parse() {
+        results() {
           return this.fields.map((row) => {
-            const parse = row.items.map((column) => {
+            const results = row.items.map((column) => {
               return parseInt(column.model || 0, 10) / 100;
             });
-            return parse.some((element) => element !== 0) ? parse : [0];
+            return results.some((element) => element !== 0) ? results : [0];
           });
         },
       },
@@ -365,12 +365,12 @@
           });
         },
         empty(object) {
-          return object.items.length === 1 && !object.items[0].value
+          return object.items.length === 1 && !object.items[0].value;
         },
         analyze(array, {
           index = 0,
         } = {}) {
-          return this.unique(this.max([].concat(...array.map((element) => this.calculate(element, this.candidate)))))[index];
+          return this.unique(this.max([].concat(...array.map((element) => this.calculate(element, this.candidate.value)))))[index];
         },
         convert(array, {
           total = 0,
@@ -416,13 +416,13 @@
               return accumulator + value;
             }, 0);
             return {
-              total,
-              divisible,
+              total: total <= max ? total : 0,
+              divisible: total <= max ? divisible : 0,
             };
           });
         },
         submit() {
-          this.values = this.parse;
+          this.values = this.results;
         },
       },
     });
