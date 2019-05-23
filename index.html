@@ -18,60 +18,20 @@
         <v-container
           grid-list-xl
         >
-          <v-layout
-            row
-            wrap
-          >
-            <v-flex
-              xs12
-            >
-              <v-card>
-                <form
-                  @submit.prevent="submit"
+          <v-layout>
+            <v-flex>
+              <v-tabs
+                v-if="possibilities.length"
+                v-model="option"
+                class="elevation-2"
+              >
+                <v-tab
+                  v-for="index in possibilities.length"
+                  :key="index"
                 >
-                  <v-card-text>
-                    <v-layout
-                      row
-                      wrap
-                    >
-                      <v-flex
-                        v-for="(group, index) in fields"
-                        :key="index"
-                      >
-                        <v-subheader
-                          class="px-0"
-                          v-text="group.name"
-                        ></v-subheader>
-                        <div
-                          v-for="(field, index) in group.items"
-                          :key="index"
-                        >
-                          <v-text-field
-                            v-model="field.model"
-                            :label="field.label"
-                            mask="###"
-                            suffix="%"
-                          ></v-text-field>
-                        </div>
-                      </v-flex>
-                      <v-flex>
-                          <v-subheader
-                            class="px-0"
-                          >
-                            應徵人數
-                          </v-subheader>
-                          <v-select
-                          v-model="candidate.value"
-                          :items="candidates"
-                          item-text="label"
-                          item-value="value"
-                          append-icon=""
-                        ></v-select>
-                      </v-flex>
-                    </v-layout>
-                  </v-card-text>
-                </form>
-              </v-card>
+                  結果 {{ index }}
+                </v-tab>
+              </v-tabs>
             </v-flex>
           </v-layout>
           <v-layout
@@ -144,6 +104,64 @@
               </v-card>
             </v-flex>
           </v-layout>
+          <v-layout
+            row
+            wrap
+          >
+            <v-flex
+              xs12
+            >
+              <v-card>
+                <form
+                  @submit.prevent="submit"
+                >
+                  <v-card-text>
+                    <v-layout>
+                      <v-flex>
+                        <v-subheader
+                          class="px-0"
+                        >
+                          應徵人數
+                        </v-subheader>
+                        <v-select
+                          v-model="candidate.value"
+                          :items="candidates"
+                          item-text="label"
+                          item-value="value"
+                          append-icon=""
+                        ></v-select>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout
+                      row
+                      wrap
+                    >
+                      <v-flex
+                        v-for="(group, index) in fields"
+                        :key="index"
+                      >
+                        <v-subheader
+                          class="px-0"
+                          v-text="group.name"
+                        ></v-subheader>
+                        <div
+                          v-for="(field, index) in group.items"
+                          :key="index"
+                        >
+                          <v-text-field
+                            v-model="field.model"
+                            :label="field.label"
+                            mask="###"
+                            suffix="%"
+                          ></v-text-field>
+                        </div>
+                      </v-flex>
+                    </v-layout>
+                  </v-card-text>
+                </form>
+              </v-card>
+            </v-flex>
+          </v-layout>
         </v-container>
       </v-content>
     </v-app>
@@ -153,6 +171,7 @@
     new Vue({
       el: '#app',
       data: {
+        option: 0,
         candidate: {
           label: '1-5 人',
           value: {
@@ -365,21 +384,24 @@
       },
       watch: {
         results(value) {
+          this.option = 0;
           this.fill(value);
         },
       },
       computed: {
+        possibilities() {
+          return this.unique(this.max([].concat(...this.values.map((element) => this.calculate(element, this.candidate.value)))));
+        },
         total() {
           if (!this.values.length) {
             return 0;
           }
-          return this.analyze(this.values).total;
+          return this.possibilities[this.option].total;
         },
         groups() {
           if (!this.total) {
             return [];
           }
-          console.log(1, this.values)
           return this.associate(this.fields, this.convert(this.values, {
             total: this.total,
           })).filter((element) => {
@@ -408,10 +430,8 @@
             };
           });
         },
-        analyze(array, {
-          index = 0,
-        } = {}) {
-          return this.unique(this.max([].concat(...array.map((element) => this.calculate(element, this.candidate.value)))))[index];
+        analyze(array) {
+          return this.unique(this.max([].concat(...array.map((element) => this.calculate(element, this.candidate.value)))));
         },
         convert(array, {
           total = 0,
