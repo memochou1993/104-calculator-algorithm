@@ -31,7 +31,9 @@
                   :key="index"
                   class="title"
                 >
-                  {{ possibility.total }} 人
+                  <div
+                    v-text="`${possibility.total} 人`"
+                  ></div>
                 </v-tab>
               </v-tabs>
             </v-flex>
@@ -126,10 +128,9 @@
                     <v-layout>
                       <v-flex>
                         <v-subheader
+                          v-text="`應徵人數`"
                           class="px-0"
-                        >
-                          應徵人數
-                        </v-subheader>
+                        ></v-subheader>
                         <v-select
                           v-model="candidate.value"
                           :items="candidates"
