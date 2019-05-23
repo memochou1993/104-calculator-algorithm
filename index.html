@@ -161,54 +161,6 @@
     new Vue({
       el: '#app',
       data: {
-        titles: [
-          [
-            '性別分布',
-            [
-              '男',
-              '女',
-            ],
-          ],
-          [
-            '學歷分布',
-            [
-              '博碩士',
-              '大學',
-              '專科',
-              '高中職',
-              '國中以下',
-            ],
-          ],
-          [
-            '年齡分布',
-            [
-              '20歲以下',
-              '21-25歲',
-              '26-30歲',
-              '31-35歲',
-              '36-40歲',
-              '41-45歲',
-              '46-50歲',
-              '51-55歲',
-              '56-60歲',
-              '60歲以上',
-            ],
-          ],
-          [
-            '工作經驗分布',
-            [
-              '無工作經驗',
-              '1年以下',
-              '1-3年',
-              '3-5年',
-              '5-10年',
-              '10-15年',
-              '15-20年',
-              '20-25年',
-              '25年',
-            ]
-          ]
-        ],
         candidate: {
           label: '1-5 人',
           value: {
@@ -383,7 +335,7 @@
           if (!this.total) {
             return [];
           }
-          return this.associate(this.titles, this.convert(this.values, {
+          return this.associate(this.fields, this.convert(this.values, {
             total: this.total,
           })).filter((element) => {
             return !this.empty(element);
@@ -402,10 +354,10 @@
         associate(keys, values) {
           return keys.map((key, index) => {
             return {
-              name: key[0],
+              name: key.name,
               items: values[index].map((value, index) => {
                 return {
-                  name: key[1][index],
+                  name: key.items[index].label,
                   value,
                 };
               }),
