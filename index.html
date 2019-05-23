@@ -94,6 +94,7 @@
               xs12
             >
               <v-card
+                v-if="group.items.length"
                 height="100%"
               >
                 <v-card-text>
@@ -188,6 +189,13 @@
             value: {
               min: 11,
               max: 30,
+            },
+          },
+          {
+            label: '30 人以上',
+            value: {
+              min: 31,
+              max: 60,
             },
           },
         ],
@@ -389,10 +397,9 @@
         },
         results() {
           return this.fields.map((row) => {
-            const results = row.items.map((column) => {
+            return row.items.map((column) => {
               return parseInt(column.model || 0, 10) / 100;
             });
-            return results.some((element) => element !== 0) ? results : [0];
           });
         },
       },
@@ -468,7 +475,9 @@
           });
         },
         submit() {
-          this.values = this.results;
+          this.values = this.results.map((element) => {
+            return element.filter(Number);
+          });
         },
       },
     });
