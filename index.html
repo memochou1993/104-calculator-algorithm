@@ -37,11 +37,13 @@
                       <v-flex
                         v-for="(group, index) in fields"
                         :key="index"
-                        sm-2
-                        xs-12
                       >
+                        <v-subheader
+                          class="px-0"
+                          v-text="group.name"
+                        ></v-subheader>
                         <div
-                          v-for="(field, index) in group"
+                          v-for="(field, index) in group.items"
                           :key="index"
                         >
                           <v-text-field
@@ -52,13 +54,17 @@
                           ></v-text-field>
                         </div>
                       </v-flex>
-                      <v-flex
-                        sm-2
-                        xs-12
-                      >
-                        <v-select
-                          :items="types"
-                          label="應徵人數"
+                      <v-flex>
+                          <v-subheader
+                            class="px-0"
+                          >
+                            應徵人數
+                          </v-subheader>
+                          <v-select
+                          v-model="candidate"
+                          :items="candidates"
+                          item-text="label"
+                          item-value="value"
                           append-icon=""
                         ></v-select>
                         <v-btn
@@ -136,7 +142,7 @@
                           class="py-1"
                         >
                           <div
-                            v-text="item.value"
+                            v-text="`${item.value} 人`"
                           ></div>
                         </v-flex>
                       </v-layout>
@@ -203,130 +209,167 @@
             ]
           ]
         ],
-        types: [
-          '1-5 人',
-          '6-10 人',
-          '11-30 人',
+        candidate: {
+          label: '1-5 人',
+          value: {
+            min: 1,
+            max: 5,
+          },
+        },
+        candidates: [
+          {
+            label: '1-5 人',
+            value: {
+              min: 1,
+              max: 5,
+            },
+          },
+          {
+            label: '6-10 人',
+            value: {
+              min: 6,
+              max: 10,
+            },
+          },
+          {
+            label: '11-30 人',
+            value: {
+              min: 11,
+              max: 30,
+            },
+          },
         ],
         fields: [
-          [
-            {
-              model: '',
-              label: '男',
-            },
-            {
-              model: '',
-              label: '女',
-            },
-          ],
-          [
-            {
-              model: '',
-              label: '博碩士',
-            },
-            {
-              model: '',
-              label: '大學',
-            },
-            {
-              model: '',
-              label: '專科',
-            },
-            {
-              model: '',
-              label: '高中職',
-            },
-            {
-              model: '',
-              label: '國中以下',
-            },
-          ],
-          [
-            {
-              model: '',
-              label: '20 歲以下',
-            },
-            {
-              model: '',
-              label: '21-25 歲',
-            },
-            {
-              model: '',
-              label: '26-30 歲',
-            },
-            {
-              model: '',
-              label: '31-35 歲',
-            },
-            {
-              model: '',
-              label: '36-40 歲',
-            },
-            {
-              model: '',
-              label: '41-45 歲',
-            },
-            {
-              model: '',
-              label: '46-50 歲',
-            },
-            {
-              model: '',
-              label: '51-55 歲',
-            },
-            {
-              model: '',
-              label: '56-60 歲',
-            },
-            {
-              model: '',
-              label: '60 歲以上',
-            },
-          ],
-          [
-            {
-              model: '',
-              label: '無工作經驗',
-            },
-            {
-              model: '',
-              label: '1 年以下',
-            },
-            {
-              model: '',
-              label: '1-3 年',
-            },
-            {
-              model: '',
-              label: '3-5 年',
-            },
-            {
-              model: '',
-              label: '5-10 年',
-            },
-            {
-              model: '',
-              label: '10-15 年',
-            },
-            {
-              model: '',
-              label: '15-20 年',
-            },
-            {
-              model: '',
-              label: '20-25 年',
-            },
-            {
-              model: '',
-              label: '25 年以上',
-            },
-          ],
+          {
+            name: '性別分布',
+            items: [
+              {
+                model: '',
+                label: '男',
+              },
+              {
+                model: '',
+                label: '女',
+              },
+            ],
+          },
+          {
+            name: '學歷分布',
+            items: [
+              {
+                model: '',
+                label: '博碩士',
+              },
+              {
+                model: '',
+                label: '大學',
+              },
+              {
+                model: '',
+                label: '專科',
+              },
+              {
+                model: '',
+                label: '高中職',
+              },
+              {
+                model: '',
+                label: '國中以下',
+              },
+            ],
+          },
+          {
+            name: '年齡分布',
+            items: [
+              {
+                model: '',
+                label: '20 歲以下',
+              },
+              {
+                model: '',
+                label: '21-25 歲',
+              },
+              {
+                model: '',
+                label: '26-30 歲',
+              },
+              {
+                model: '',
+                label: '31-35 歲',
+              },
+              {
+                model: '',
+                label: '36-40 歲',
+              },
+              {
+                model: '',
+                label: '41-45 歲',
+              },
+              {
+                model: '',
+                label: '46-50 歲',
+              },
+              {
+                model: '',
+                label: '51-55 歲',
+              },
+              {
+                model: '',
+                label: '56-60 歲',
+              },
+              {
+                model: '',
+                label: '60 歲以上',
+              },
+            ],
+          },
+          {
+            name: '工作經驗分布',
+              items: [
+              {
+                model: '',
+                label: '無工作經驗',
+              },
+              {
+                model: '',
+                label: '1 年以下',
+              },
+              {
+                model: '',
+                label: '1-3 年',
+              },
+              {
+                model: '',
+                label: '3-5 年',
+              },
+              {
+                model: '',
+                label: '5-10 年',
+              },
+              {
+                model: '',
+                label: '10-15 年',
+              },
+              {
+                model: '',
+                label: '15-20 年',
+              },
+              {
+                model: '',
+                label: '20-25 年',
+              },
+              {
+                model: '',
+                label: '25 年以上',
+              },
+            ],
+          },
         ],
         values: [
-          [0.88, 0.11],
-          [0.22, 0.66, 0.05, 0.05, 0],
-          [0, 0.50, 0.22, 0.16, 0.11, 0, 0, 0, 0, 0],
-          [0.05, 0.22, 0.16, 0.33, 0.11, 0.11, 0, 0, 0],
+          [0],
+          [0],
+          [0],
+          [0],
         ],
       },
       computed: {
@@ -345,7 +388,15 @@
           })).filter((element) => {
             return !this.empty(element);
           });
-        }
+        },
+        parse() {
+          return this.fields.map((row) => {
+            const parse = row.items.map((column) => {
+              return parseInt(column.model || 0, 10) / 100;
+            });
+            return parse.some((element) => element !== 0) ? parse : [0];
+          });
+        },
       },
       methods: {
         associate(keys, values) {
@@ -367,7 +418,7 @@
         analyze(array, {
           index = 0,
         } = {}) {
-          return this.unique(this.max([].concat(...array.map((element) => this.calculate(element)))))[index];
+          return this.unique(this.max([].concat(...array.map((element) => this.calculate(element, this.candidate)))))[index];
         },
         convert(array, {
           total = 0,
@@ -419,7 +470,7 @@
           });
         },
         submit() {
-          console.log(this.fields);
+          this.values = this.parse;
         },
       },
     });
