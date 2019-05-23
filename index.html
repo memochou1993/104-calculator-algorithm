@@ -379,10 +379,11 @@
           if (!this.total) {
             return [];
           }
+          console.log(1, this.values)
           return this.associate(this.fields, this.convert(this.values, {
             total: this.total,
           })).filter((element) => {
-            return !this.empty(element);
+            return element.items.length;
           });
         },
         results() {
@@ -406,9 +407,6 @@
               }),
             };
           });
-        },
-        empty(object) {
-          return !object.items.length;
         },
         analyze(array, {
           index = 0,
