@@ -67,14 +67,6 @@
                           item-value="value"
                           append-icon=""
                         ></v-select>
-                        <v-btn
-                          block
-                          type="submit"
-                          color="indigo"
-                          class="white--text"
-                        >
-                          計算
-                        </v-btn>
                       </v-flex>
                     </v-layout>
                   </v-card-text>
@@ -87,9 +79,8 @@
             wrap
           >
             <v-flex
-              v-if="groups.length"
-              v-for="(group, i) in groups"
-              :key="i"
+              v-for="(group, index) in groups"
+              :key="index"
               sm6
               xs12
             >
@@ -370,13 +361,12 @@
             ],
           },
         ],
-        values: [
-          [0],
-          [0],
-          [0],
-          [0],
-          [0],
-        ],
+        values: [],
+      },
+      watch: {
+        results(value) {
+          this.fill(value);
+        },
       },
       computed: {
         total() {
@@ -418,7 +408,7 @@
           });
         },
         empty(object) {
-          return object.items.length === 1 && !object.items[0].value;
+          return !object.items.length;
         },
         analyze(array, {
           index = 0,
@@ -455,6 +445,11 @@
         percentage(value, total) {
           return value / total * 100;
         },
+        fill(array) {
+          this.values = array.map((element) => {
+            return element.filter(Number);
+          });
+        },
         calculate(array, {
           min = 11,
           max = 30,
@@ -472,11 +467,6 @@
               total: total <= max ? total : 0,
               divisible: total <= max ? divisible : 0,
             };
-          });
-        },
-        submit() {
-          this.values = this.results.map((element) => {
-            return element.filter(Number);
           });
         },
       },
