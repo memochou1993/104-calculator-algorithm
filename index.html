@@ -23,13 +23,15 @@
               <v-tabs
                 v-if="possibilities.length"
                 v-model="option"
+                grow
                 class="elevation-2"
               >
                 <v-tab
-                  v-for="index in possibilities.length"
+                  v-for="(possibility, index) in possibilities"
                   :key="index"
+                  class="title"
                 >
-                  結果 {{ index }}
+                  {{ possibility.total }} 人
                 </v-tab>
               </v-tabs>
             </v-flex>
@@ -53,10 +55,15 @@
                     column
                   >
                     <v-flex>
-                      <h3
-                        class="headline mb-0"
+                      <span
                         v-text="group.name"
-                      ></h3>
+                        class="d-inline-flex inline title mb-0"
+                      ></span>
+                      <span
+                        v-if="deviation(group.items, total)"
+                        v-text="`（誤差：${deviation(group.items, total)} 人）`"
+                        class="d-inline-flex inline title mb-0"
+                      ></span>
                     </v-flex>
                     <v-divider></v-divider>
                     <v-flex
@@ -141,8 +148,8 @@
                         :key="index"
                       >
                         <v-subheader
-                          class="px-0"
                           v-text="group.name"
+                          class="px-0"
                         ></v-subheader>
                         <div
                           v-for="(field, index) in group.items"
@@ -384,7 +391,6 @@
       },
       watch: {
         results(value) {
-          this.option = 0;
           this.fill(value);
         },
       },
@@ -452,6 +458,12 @@
             });
           });
         },
+        deviation(array, total) {
+          return Math.abs(array.reduce((accumulator, element) => {
+            const value = element.value;
+            return accumulator + value;
+          }, 0) - total);
+        },
         range(min, max) {
           return Array.from(
             {
@@ -464,6 +476,7 @@
           return value / total * 100;
         },
         fill(array) {
+          this.option = 0;
           this.values = array.map((element) => {
             return element.filter(Number);
           });
@@ -490,5 +503,11 @@
       },
     });
   </script>
+
+  <style>
+    .inline {
+      float: left;
+    }
+  </style>
 </body>
 </html>
