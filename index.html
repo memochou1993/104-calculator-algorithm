@@ -39,27 +39,33 @@ function unique(arr) {
   });
 }
 
-function calculate(arr, {
+function range(min, max) {
+  return Array.from(
+    {
+      length: max - min + 1,
+    },
+    (_, i) => min + i,
+  );
+}
+
+function calculate(array, {
   min = 11,
   max = 30,
 } = {}) {
-  let results = [];
-  for (let i = min; i <= max; i++) {
-    let total = 0;
-    let divisible = 0;
-    arr.forEach(ele => {
-      const number = ele * i;
-      const remainder = number % 1;
-      total += Math.round(number);
-      divisible += Math.round(remainder * 10) / 10 % 1 === 0 ? 1 : 0;
-    });
-    if (total < max) {
-      results.push({
-        total,
-        divisible,
-      });
-    }
-  }
-  return results;
+  return this.range(min, max).map((index) => {
+    const total = array.reduce((accumulator, element) => {
+      const value = Math.round(element * index);
+      return accumulator + value;
+    }, 0);
+    const divisible = array.reduce((accumulator, element) => {
+      const value = Math.round(element * index % 1 * 10) / 10 % 1 === 0 ? 1 : 0;
+      return accumulator + value;
+    }, 0);
+    const exceed = total > max;
+    return {
+      total: exceed ? 0 : total,
+      divisible: exceed ? 0 : divisible,
+    };
+  });
 }
 </script>
